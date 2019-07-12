@@ -4,66 +4,66 @@ C0=16.35 ; CS0=17.32 ; DB0=17.32 ; D0=18.35 ; DS0=19.45 ; EB0=19.45 ; E0=20.60 ;
 printf “\nWelcome to the Music Box Script! Hearable notes go between E0 and B8.\n\n”
 
 play() {
-for x in $@; do
-prenote=$(echo $x|tr ‘[a-z]’ ‘[A-Z]’)
-note=$prenote
-#echo “beep -f $note = ${!note}”
-beep -f ${!note} >/dev/null 2>/dev/null; errCatch=”$?”
-if [[ $errCatch != “0” ]]; then
-echo $errCatch
-return $errCatch
-fi
-done
+	for x in $@; do
+		prenote=$(echo $x|tr ‘[a-z]’ ‘[A-Z]’)
+		note=$prenote
+		#echo “beep -f $note = ${!note}”
+		beep -f ${!note} >/dev/null 2>/dev/null; errCatch=”$?”
+		if [[ $errCatch != “0” ]]; then
+			echo $errCatch
+			return $errCatch
+		fi
+	done
 };
 
 composeDone() {
-notes=”-l 0.1 -f 1″
-for x in $@; do
-prenote=$(echo $x|tr ‘[a-z]’ ‘[A-Z]’)
-notes=”$notes -n -f ${!prenote}”
-done
-echo beep $notes
-beep $notes
-exit 0
-
+	notes=”-l 0.1 -f 1″
+	for x in $@; do
+		prenote=$(echo $x|tr ‘[a-z]’ ‘[A-Z]’)
+		notes=”$notes -n -f ${!prenote}”
+	done
+	echo beep $notes
+	beep $notes
+	exit 0
 }
 
 compose() {
-noteList=””
-while :; do
-errCatch2=””
-prompt2=”Enter your note(s) in the notation of (ex: F8 or EB5) (enter \”done\” when finished):”
-read -p “$prompt2 ” opt2
-if [[ $opt2 == “done” ]]; then composeDone $noteList; fi
-errCatch2=$(play $opt2)
-#play $opt2 >/dev/null 2>/dev/null ; errCatch=”$?”
-if [[ $errCatch2 == “” ]]; then
-noteList=”$noteList $opt2″
-else
-printf “\nBad note detected, throwing out entry…\n\n”
-fi
-echo “Current noteList: $noteList”
-done
+	noteList=””
+	while :; do
+		errCatch2=””
+		prompt2=”Enter your note(s) in the notation of (ex: F8 or EB5) (enter \”done\” when finished):”
+		read -p “$prompt2 ” opt2
+		if [[ $opt2 == “done” ]]; then composeDone $noteList; fi
+		errCatch2=$(play $opt2)
+		#play $opt2 >/dev/null 2>/dev/null ; errCatch=”$?”
+		if [[ $errCatch2 == “” ]]; then
+			noteList=”$noteList $opt2″
+		else
+			printf “\nBad note detected, throwing out entry…\n\n”
+		fi
+		echo “Current noteList: $noteList”
+	done
 }
 
 prompt=”Enter your note(s) in the notation of (ex: F8 or EB5) (enter ‘x’ to eXit or ‘c’ for composer mode):”
 while :; do
-read -p “$prompt ” opt
-case $opt in
-“x”)
-exit 0
-;;
-“X”)
-exit 0
-;;
-“c”|”C”)
-printf “\nEnter Composer Mode…\n\n”
-compose
-exit 0
-;;
-*)
-play $opt
-;;
-esac
+	read -p “$prompt ” opt
+	case $opt in
+	“x”)
+		exit 0
+		;;
+	“X”)
+		exit 0
+		;;
+	“c”|”C”)
+		printf “\nEnter Composer Mode…\n\n”
+		compose
+		exit 0
+		;;
+	*)
+		play $opt
+		;;
+	esac
 done
+
 exit 0
