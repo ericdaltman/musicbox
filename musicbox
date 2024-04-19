@@ -20,7 +20,7 @@ composeDone() {
 	notes="-l 0.1 -f 1"
 	for x in $@; do
 		prenote=$(echo $x|tr '[a-z]' '[A-Z]')
-		notes="$notes -n -f ${!prenote}"
+		notes="$notes -n -l 200 -f ${!prenote}"
 	done
 	echo beep $notes
 	beep $notes
@@ -31,21 +31,30 @@ compose() {
 	noteList=""
 	while :; do
 		errCatch2=""
-		prompt2="Enter your note\(s\) in the notation of \(ex: F8 or EB5\) \(enter \"done\" when finished\):"
+		prompt2="Enter your note(s) in the notation of (ex: CS4, F8 or EB5) (enter \"-\" to delete last note and \"done\" when finished):"
 		read -p "$prompt2 " opt2
-		if [[ $opt2 == "done" ]]; then composeDone $noteList; fi
+		if [[ $opt2 == "-" ]]; then
+			noteList="$(echo $noteList|sed 's/\s*\w*$//')"
+		elif [[ $opt2 == "done" ]]; then
+		       composeDone $noteList
+		fi
+
 		errCatch2=$(play $opt2)
 		#play $opt2 >/dev/null 2>/dev/null ; errCatch="$?"
 		if [[ $errCatch2 == "" ]]; then
 			noteList="$noteList $opt2"
 		else
-			printf "\nBad note detected, throwing out entry...\n\n"
+			if [[ $opt2 == "-" ]]; then
+				echo ""
+			else
+				printf "\nBad note detected, throwing out entry...\n\n"
+			fi
 		fi
 		echo "Current noteList: $noteList"
 	done
 }
 
-prompt="Enter your note\(s\) in the notation of \(ex: F8 or EB5\) \(enter 'x' to eXit or 'c' for composer mode\):"
+prompt="Enter your note(s) in the notation of (ex: CS4, F8 or EB5) (enter 'x' to eXit or 'c' for composer mode):"
 while :; do
 	read -p "$prompt " opt
 	case $opt in
